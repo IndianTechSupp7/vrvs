@@ -11,6 +11,11 @@
     "ios": {
       "supportsTablet": true
     },
+    "fonts": [
+      "./assets/fonts/Poppins-Regular.ttf",
+      "./assets/fonts/Poppins-SemiBold.ttf",
+      "./assets/fonts/Poppins-Bold.ttf"
+    ],
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -23,7 +28,8 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
