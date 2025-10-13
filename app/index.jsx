@@ -27,6 +27,7 @@ import Students from "../components/pages/Students";
 import TripCost from "../components/pages/TripCost";
 import Welcome from "../components/pages/welcome";
 import Pagination from "../components/pagination/Pagination";
+import { GlobalProvider } from "../providers/global";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -91,9 +92,9 @@ export default function Index() {
 
   const bgColor = useAnimatedStyle(() => {
     const backgroundColor = interpolateColor(
-      Math.abs(x),
-      [0, SCREEN_WIDTH, SCREEN_WIDTH * 2, SCREEN_WIDTH * 3, SCREEN_WIDTH * 4],
-      ["#c2d6f6", "#ffffff", "#c2d6f6", "#c2d6f6", "#c2d6f6"]
+      Math.abs(x.value),
+      [0, SCREEN_WIDTH, SCREEN_WIDTH * 2, SCREEN_WIDTH * 3],
+      ["#c2d6f6", "#ffffff", "#c2d6f6", "#c2d6f6"]
     );
     return { backgroundColor };
   });
@@ -102,7 +103,7 @@ export default function Index() {
     const c = managerRef.current;
     const max = (c?.length - 1) * SCREEN_WIDTH;
     const min = (c?.length - 2) * SCREEN_WIDTH;
-    const val = clamp(Math.abs(x.value), min, max) % SCREEN_WIDTH;
+    const val = clamp(Math.abs(x.value), min, max) - min;
     const width = interpolate(
       val,
       [0, SCREEN_WIDTH],
@@ -116,7 +117,7 @@ export default function Index() {
     const c = managerRef.current;
     const max = (c?.length - 1) * SCREEN_WIDTH;
     const min = (c?.length - 2) * SCREEN_WIDTH;
-    const val = clamp(Math.abs(x.value), min, max) % SCREEN_WIDTH;
+    const val = clamp(Math.abs(x.value), min, max) - min;
     const translateX = interpolate(
       val,
       [0, SCREEN_WIDTH],
@@ -139,7 +140,7 @@ export default function Index() {
     const c = managerRef.current;
     const max = (c?.length - 1) * SCREEN_WIDTH;
     const min = (c?.length - 2) * SCREEN_WIDTH;
-    const val = clamp(Math.abs(x.value), min, max) % SCREEN_WIDTH;
+    const val = clamp(Math.abs(x.value), min, max) - min;
     const translateX = interpolate(
       val,
       [0, SCREEN_WIDTH],
@@ -156,37 +157,39 @@ export default function Index() {
   });
 
   return (
-    <GestureHandlerRootView>
-      <Animated.View
-        style={bgColor}
-        className="flex w-full h-screen bg-background absolute"
-      >
-        <StatusBar style="light" />
-        <PageManager ref={managerRef} x={x} currentiIndex={currentiIndex}>
-          <Welcome />
-          <TripCost />
-          <Students />
-          <Options />
-        </PageManager>
-        <Pagination data={Array.from({ length: 4 })} x={x} />
-        <Btn
-          style={btnAnimation}
-          className="h-[80px] rounded-full absolute bottom-20 self-center overflow-hidden"
-          onPress={swipeLeft}
+    <GlobalProvider>
+      <GestureHandlerRootView>
+        <Animated.View
+          style={bgColor}
+          className="flex w-full h-screen bg-background absolute"
         >
-          <View className="flex  flex-row w-[80px] relative items-center justify-center">
-            <AnimatedText
-              style={textAnimation}
-              className="absolute text-xl font-poppins-bold text-white"
-            >
-              Tovább
-            </AnimatedText>
-            <Animated.View style={[arrowAnimation]}>
-              <ArrowRight color={"white"} />
-            </Animated.View>
-          </View>
-        </Btn>
-      </Animated.View>
-    </GestureHandlerRootView>
+          <StatusBar style="light" />
+          <PageManager ref={managerRef} x={x} currentiIndex={currentiIndex}>
+            <Welcome />
+            <TripCost />
+            <Students />
+            <Options />
+          </PageManager>
+          <Pagination data={Array.from({ length: 4 })} x={x} />
+          <Btn
+            style={btnAnimation}
+            className="h-[80px] rounded-full absolute bottom-20 self-center overflow-hidden"
+            onPress={swipeLeft}
+          >
+            <View className="flex  flex-row w-[80px] relative items-center justify-center">
+              <AnimatedText
+                style={textAnimation}
+                className="absolute text-xl font-poppins-bold text-white"
+              >
+                Tovább
+              </AnimatedText>
+              <Animated.View style={[arrowAnimation]}>
+                <ArrowRight color={"white"} />
+              </Animated.View>
+            </View>
+          </Btn>
+        </Animated.View>
+      </GestureHandlerRootView>
+    </GlobalProvider>
   );
 }

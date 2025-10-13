@@ -5,13 +5,16 @@ import Animated, {
   clamp,
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
 } from "react-native-reanimated";
+import { useGlobalProvider } from "../providers/global";
 
-const MIN_VELOCITY = 300
+const MIN_VELOCITY = 300;
+const SWIPE_THRESHOLD = 50;
 
 const PageManager = forwardRef(({ children: pages, x, currentiIndex }, ref) => {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const { verticalGestureRef } = useGlobalProvider();
 
   const context = useSharedValue(0);
   // const [currentiIndex, setCurrentIndex] = useState(0);
@@ -37,6 +40,7 @@ const PageManager = forwardRef(({ children: pages, x, currentiIndex }, ref) => {
     .onBegin(() => {
       context.value = Math.abs(x.value);
     })
+
     .onUpdate((e) => {
       const clampValue = clamp(
         context.value - e.translationX,
@@ -71,8 +75,10 @@ const PageManager = forwardRef(({ children: pages, x, currentiIndex }, ref) => {
           duration: 500,
         });
       }
-    });
-
+    })
+    .activeOffsetX([-SWIPE_THRESHOLD, SWIPE_THRESHOLD]) // must move 10px horizontally to activate
+    .activeOffsetY([-SWIPE_THRESHOLD, SWIPE_THRESHOLD]); // vertical movement cancels horizontal pan
+  //.simultaneousWithExternalGesture(verticalGestureRef);
   useImperativeHandle(ref, () => ({
     x,
     currentiIndex,
@@ -80,7 +86,7 @@ const PageManager = forwardRef(({ children: pages, x, currentiIndex }, ref) => {
   }));
 
   return (
-    <GestureDetector gesture={PanGesture}>
+    <GestureDetector gesture={PanGesture} nestedScrollEnabled={true}>
       <View className="flex-1">
         <Animated.View
           className="flex-1 flex justify-between flex-row"
