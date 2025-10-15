@@ -2,11 +2,21 @@ import { useWindowDimensions } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
+  interpolateColor,
   useAnimatedStyle,
 } from "react-native-reanimated";
 
 const Dot = ({ index, x }) => {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
+
+  const animatedBg = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      Math.abs(x.value),
+      [0, SCREEN_WIDTH, SCREEN_WIDTH * 2, SCREEN_WIDTH * 3],
+      ["#ffffff", "#c2d6f6", "#ffffff", "#ffffff"]
+    );
+    return { backgroundColor };
+  });
 
   const animatedDotStyle = useAnimatedStyle(() => {
     const widthAnimation = interpolate(
@@ -55,7 +65,7 @@ const Dot = ({ index, x }) => {
   return (
     <Animated.View
       className="h-3 mx-2 rounded-full"
-      style={[animatedDotStyle, { backgroundColor: "#ffffff" }]} //animatedColor
+      style={[animatedDotStyle, animatedBg]} //animatedColor
     />
   );
 };

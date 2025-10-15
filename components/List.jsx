@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import { useWindowDimensions, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { v4 as uuidv4 } from "uuid";
+import { cn } from "../lib/utils";
 import { useGlobalProvider } from "../providers/global";
 import RenderItem from "./RenderItem";
 
 const LayoutTransition = LinearTransition.springify().duration(300);
 
-const List = ({ data, setData, style }) => {
+const List = ({ data, setData, style, className }) => {
+  const { height: SCREEN_HEIGHT } = useWindowDimensions();
   const { verticalGestureRef } = useGlobalProvider();
   const [dt, setDt] = useState(data);
 
@@ -25,9 +28,9 @@ const List = ({ data, setData, style }) => {
 
   return (
     <ScrollView
-      style={{ maxHeight: 600 }}
+      style={{ maxHeight: (SCREEN_HEIGHT / 3) * 2 }}
       ref={verticalGestureRef}
-      className="w-full "
+      className={cn("w-full ", className)}
     >
       {dt
         .slice() // make a copy so original array isn’t mutated
@@ -37,6 +40,7 @@ const List = ({ data, setData, style }) => {
             <RenderItem item={item} setData={setDt} index={index} />
           </Animated.View>
         ))}
+      <View className="flex-1 py-40" />
     </ScrollView>
   );
 };
