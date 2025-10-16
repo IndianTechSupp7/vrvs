@@ -1,6 +1,7 @@
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowRight } from "lucide-react-native";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -27,7 +28,6 @@ import Students from "../components/pages/Students";
 import TripCost from "../components/pages/TripCost";
 import Welcome from "../components/pages/welcome";
 import Pagination from "../components/pagination/Pagination";
-import { GlobalProvider } from "../providers/global";
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -37,6 +37,15 @@ export default function Index() {
   const x = useSharedValue(0);
   const bounce = useSharedValue(0);
   const [currentiIndex, setCurrentIndex] = useState(0);
+  const router = useRouter();
+  const max = useSharedValue(0);
+  const min = useSharedValue(0);
+
+  useEffect(() => {
+    const c = managerRef.current;
+    max.value = (c.length - 1) * SCREEN_WIDTH;
+    min.value = (c.length - 2) * SCREEN_WIDTH;
+  }, [managerRef.current]);
 
   useAnimatedReaction(
     () => {
@@ -81,7 +90,11 @@ export default function Index() {
 
   const swipeLeft = () => {
     const current = managerRef.current;
-    if (x.value % SCREEN_WIDTH !== 0) return;
+    if (Math.abs(x.value) === SCREEN_WIDTH * 3) {
+      router.push("/results");
+      return;
+    }
+    if (Math.abs(x.value) % SCREEN_WIDTH !== 0) return;
     const val = clamp(
       Math.abs(x.value) + SCREEN_WIDTH,
       0,
@@ -100,10 +113,7 @@ export default function Index() {
   });
 
   const btnAnimation = useAnimatedStyle(() => {
-    const c = managerRef.current;
-    const max = (c?.length - 1) * SCREEN_WIDTH;
-    const min = (c?.length - 2) * SCREEN_WIDTH;
-    const val = clamp(Math.abs(x.value), min, max) - min;
+    const val = clamp(Math.abs(x.value), min.value, max.value) - min.value;
     const width = interpolate(
       val,
       [0, SCREEN_WIDTH],
@@ -114,10 +124,7 @@ export default function Index() {
   });
 
   const arrowAnimation = useAnimatedStyle(() => {
-    const c = managerRef.current;
-    const max = (c?.length - 1) * SCREEN_WIDTH;
-    const min = (c?.length - 2) * SCREEN_WIDTH;
-    const val = clamp(Math.abs(x.value), min, max) - min;
+    const val = clamp(Math.abs(x.value), min.value, max.value) - min.value;
     const translateX = interpolate(
       val,
       [0, SCREEN_WIDTH],
@@ -137,9 +144,6 @@ export default function Index() {
     };
   });
   const textAnimation = useAnimatedStyle(() => {
-    const c = managerRef.current;
-    const max = (c?.length - 1) * SCREEN_WIDTH;
-    const min = (c?.length - 2) * SCREEN_WIDTH;
     const val = clamp(Math.abs(x.value), min, max) - min;
     const translateX = interpolate(
       val,
@@ -157,39 +161,37 @@ export default function Index() {
   });
 
   return (
-    <GlobalProvider>
-      <GestureHandlerRootView>
-        <Animated.View
-          style={bgColor}
-          className="flex w-full h-screen bg-background absolute"
+    <GestureHandlerRootView>
+      <Animated.View
+        style={bgColor}
+        className="flex w-full h-screen bg-background absolute"
+      >
+        <StatusBar style="light" />
+        <PageManager ref={managerRef} x={x} currentiIndex={currentiIndex}>
+          <Welcome x={x} />
+          <TripCost />
+          <Students />
+          <Options />
+        </PageManager>
+        <Pagination data={Array.from({ length: 4 })} x={x} />
+        <Btn
+          style={btnAnimation}
+          className="h-[80px] rounded-full absolute bottom-20 self-center overflow-hidden"
+          onPress={swipeLeft}
         >
-          <StatusBar style="light" />
-          <PageManager ref={managerRef} x={x} currentiIndex={currentiIndex}>
-            <Welcome x={x} />
-            <TripCost />
-            <Students />
-            <Options />
-          </PageManager>
-          <Pagination data={Array.from({ length: 4 })} x={x} />
-          <Btn
-            style={btnAnimation}
-            className="h-[80px] rounded-full absolute bottom-20 self-center overflow-hidden"
-            onPress={swipeLeft}
-          >
-            <View className="flex  flex-row w-[80px] relative items-center justify-center">
-              <AnimatedText
-                style={textAnimation}
-                className="absolute text-xl font-poppins-bold text-white"
-              >
-                Tovább
-              </AnimatedText>
-              <Animated.View style={[arrowAnimation]}>
-                <ArrowRight color={"white"} />
-              </Animated.View>
-            </View>
-          </Btn>
-        </Animated.View>
-      </GestureHandlerRootView>
-    </GlobalProvider>
+          <View className="flex  flex-row w-[80px] relative items-center justify-center">
+            <AnimatedText
+              style={textAnimation}
+              className="absolute text-xl font-poppins-bold text-white"
+            >
+              Tovább
+            </AnimatedText>
+            <Animated.View style={[arrowAnimation]}>
+              <ArrowRight color={"white"} />
+            </Animated.View>
+          </View>
+        </Btn>
+      </Animated.View>
+    </GestureHandlerRootView>
   );
 }

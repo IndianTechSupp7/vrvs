@@ -6,17 +6,11 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { v4 as uuidv4 } from "uuid";
 import { cn } from "../lib/utils";
 import { useGlobalProvider } from "../providers/global";
+import RenderItem from "./RenderItemStudents";
 
 const LayoutTransition = LinearTransition.springify().duration(300);
 
-const List = ({
-  data,
-  setData,
-  RenderItem,
-  style,
-  className,
-  dFilter = (x) => x,
-}) => {
+const List = ({ data, setData, style, className }) => {
   const { height: SCREEN_HEIGHT } = useWindowDimensions();
   const { verticalGestureRef } = useGlobalProvider();
   const [dt, setDt] = useState(data);
@@ -24,7 +18,7 @@ const List = ({
   useEffect(() => {
     const f = dt.filter((x) => x.init)?.length;
     if (!f || f === 0) {
-      setDt((p) => [...p, { id: uuidv4(), init: true }]);
+      setDt((data) => [...data, { id: uuidv4(), init: true }]);
     }
   }, [data]);
   useEffect(() => {
@@ -42,11 +36,7 @@ const List = ({
         .reverse()
         .map((item, index) => (
           <Animated.View key={item.id} layout={LayoutTransition}>
-            {RenderItem({
-              item: item,
-              setData: setDt,
-              index: index,
-            })}
+            <RenderItem item={item} setData={setDt} index={index} />
           </Animated.View>
         ))}
       <View className="flex-1 py-40" />

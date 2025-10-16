@@ -1,6 +1,7 @@
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import "../global.css";
+import { GlobalProvider } from "../providers/global";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -10,10 +11,12 @@ export default function RootLayout() {
   });
   if (!fontsLoaded) return null;
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <GlobalProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </GlobalProvider>
   );
 }
