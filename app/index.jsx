@@ -144,7 +144,7 @@ export default function Index() {
     };
   });
   const textAnimation = useAnimatedStyle(() => {
-    const val = clamp(Math.abs(x.value), min, max) - min;
+    const val = clamp(Math.abs(x.value), min.value, max.value) - min.value;
     const translateX = interpolate(
       val,
       [0, SCREEN_WIDTH],
