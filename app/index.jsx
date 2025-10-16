@@ -165,7 +165,7 @@ export default function Index() {
         >
           <StatusBar style="light" />
           <PageManager ref={managerRef} x={x} currentiIndex={currentiIndex}>
-            <Welcome />
+            <Welcome x={x} />
             <TripCost />
             <Students />
             <Options />
